@@ -1,0 +1,7 @@
+.DS_Store
+*venv/
+*.env
+*__pycache__/
+*.idea/
+*.sqlfluff
+db.sqlite3
