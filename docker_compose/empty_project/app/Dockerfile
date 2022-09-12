@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.10-slim
 
 WORKDIR /opt/app
 
@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt requirements.txt
 
 
-RUN pip install --upgrade pip \
+RUN pip install --upgrade --no-cache-dir pip \
     && pip install -r requirements.txt
 
 COPY entrypoint.sh entrypoint.sh
