@@ -16,13 +16,11 @@ services:
 
 
   db:
-    image: postgres:13
+    image: postgres:14.0-alpine
     volumes:
       - db_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=app
-      - POSTGRES_PASSWORD=123qwe
-      - POSTGRES_DB=movies_database
+    env_file:
+      - .env
 
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
@@ -31,7 +29,7 @@ services:
       retries: 5
 
   nginx:
-    image: nginx:1.19.2
+    image: nginx:1.23.1
     ports:
       - 80:80
 
