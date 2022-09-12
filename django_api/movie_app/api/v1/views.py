@@ -5,36 +5,34 @@ from django.views.generic.list import BaseListView
 from django.views.generic.detail import BaseDetailView
 
 
-from movies.models import Filmwork
+from movies.models import Filmwork, PersonFilmwork
+
+RoleType = PersonFilmwork.RoleType
+
 
 class MoviesApiMixin:
     model = Filmwork
     http_method_names = ["get"]  # Список методов, которые реализует обработчик
     paginate_by = 50
 
+    def get_person_aggragation(self, RoleType: str):
+        return ArrayAgg(
+            "persons__full_name",
+            filter=Q(personfilmwork__role=RoleType),
+            distinct=True,
+        )
+
     def get_queryset(self):
         # return Genre.objects.all().values().annotate(table = Person.objects.all().count())
 
         return (
             Filmwork.objects.values("id", "id", "title", "description", "creation_date", "rating", "type").annotate(
-                actors=ArrayAgg(
-                    "persons__full_name",
-                    filter=Q(personfilmwork__role="actor"),
-                    distinct=True,
-                )
+                actors=self.get_person_aggragation(RoleType.ACTOR)
             )
                 .annotate(
-                directors=ArrayAgg(
-                    "persons__full_name",
-                    filter=Q(personfilmwork__role="director"),
-                    distinct=True,
-                )
+                directors=self.get_person_aggragation(RoleType.DIRECTOR)
             ).annotate(
-                writers=ArrayAgg(
-                    "persons__full_name",
-                    filter=Q(personfilmwork__role="writer"),
-                    distinct=True,
-                )
+                writers=self.get_person_aggragation(RoleType.WRITER)
             )
                 .annotate(genres=ArrayAgg("genres__name", distinct=True))
         ).order_by("id")
